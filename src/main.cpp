@@ -22,13 +22,8 @@
 // Connect SCLK to UNO Digital #13 (Hardware SPI clock)
 // Connect MISO to UNO Digital #12 (Hardware SPI MISO)
 // Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
-#define HSPI_CLK 14
-#define HSPI_MISO 12
-#define HSPI_MOSI 13
-#define HSPI_CS 15
-
 #define RA8875_INT 5
-#define RA8875_CS HSPI_CS
+#define RA8875_CS 15
 #define RA8875_RESET 4
 
 Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
@@ -38,9 +33,6 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("RA8875 start");
-
-  // pins: SCK, MISO, MOSI, SS
-  SPI.pins(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_CS);
 
   /* Initialize the display using 'RA8875_480x80', 'RA8875_480x128', 'RA8875_480x272' or 'RA8875_800x480' */
   if (!tft.begin(RA8875_480x272)) {
