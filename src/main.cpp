@@ -41,21 +41,18 @@ void setup()
 
   // pins: SCK, MISO, MOSI, SS
   SPI.pins(HSPI_CLK, HSPI_MISO, HSPI_MOSI, HSPI_CS);
-Serial.println("set");
 
   /* Initialize the display using 'RA8875_480x80', 'RA8875_480x128', 'RA8875_480x272' or 'RA8875_800x480' */
   if (!tft.begin(RA8875_480x272)) {
     Serial.println("RA8875 Not Found!");
     while (1);
   }
-Serial.println("int");
 
   tft.displayOn(true);
   tft.GPIOX(true);      // Enable TFT - display enable tied to GPIOX
   tft.PWM1config(true, RA8875_PWM_CLK_DIV1024); // PWM output for backlight
   tft.PWM1out(255);
   tft.fillScreen(RA8875_BLACK);
-Serial.println("a");
   /* Switch to text mode */
   tft.textMode();
   tft.cursorBlink(32);
