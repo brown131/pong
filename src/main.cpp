@@ -44,20 +44,19 @@ Adafruit_RA8875 tft = Adafruit_RA8875(RA8875_CS, RA8875_RESET);
 const int16_t PADDLE_WIDTH = 40;
 const int16_t PADDLE_HEIGHT = 15;
 const int16_t PADDLE_Y = SCREEN_HEIGHT - PADDLE_HEIGHT;
-const int16_t BALL_WIDTH = 15;
-const int16_t BALL_HEIGHT = 15;
+const int16_t BALL_RADIUS = 7;
 const int16_t TEXT_LENGTH = 24;
 
 int balls = 15;
 int score = 0;
 int balls0, score0;
-boolean gameover = false;
+boolean hit_ball = false;
 
 int32_t paddle_x = (SCREEN_WIDTH - PADDLE_WIDTH) >> 1;
 int32_t paddle_x0 = paddle_x;
 
-double ball_x = (SCREEN_WIDTH - BALL_WIDTH) / 2;
-double ball_y = 0;
+double ball_x = SCREEN_WIDTH / 2;
+double ball_y = BALL_RADIUS;
 double ball_dx = 0;
 double ball_dy = 1;
 double ball_x0, ball_y0;
@@ -74,10 +73,11 @@ void resetBall() {
   double a = rnd() * PI / 3;  // Angle <= 60 degrees.
   ball_dy = cos(a) * ball_speed;
   ball_dx = (sin(a) * ball_speed) * (rnd() >= 0.5 ? 1 : -1);
+  delay(200);
 }
 
-void playBuzzer(int cycles = 10) {
-   for (int i = 0; i < cycles; i++) {
+void playBuzzer(int cycles = 20, int duration = 2) {
+  for (int i = 0; i < cycles; i++) {
     digitalWrite(BUZZER_PIN, HIGH);
     delay(1);
     digitalWrite(BUZZER_PIN, LOW);
@@ -91,22 +91,22 @@ void moveBall() {
   ball_x += ball_dx;
   ball_y += ball_dy;
 
-  if (ball_x < 0) {
-    ball_x = 0;
+  if ((ball_x - BALL_RADIUS) < 0) {
+    ball_x = BALL_RADIUS;
     ball_dx = 1 - square(ball_dy);  // Needs to be done
     playBuzzer();
   }
-  if ((ball_x + BALL_WIDTH) > SCREEN_WIDTH) {
-    ball_x = SCREEN_WIDTH - BALL_WIDTH;
+  if ((ball_x + BALL_RADIUS) > SCREEN_WIDTH) {
+    ball_x = SCREEN_WIDTH - BALL_RADIUS;
     ball_dx *= -1;
     playBuzzer();
   }
-  if (ball_y < 0) {
-    ball_y = 0;
+  if ((ball_y - BALL_RADIUS) < 0) {
+    ball_y = BALL_RADIUS;
     ball_dy = abs(ball_dy);  // Needs to be done this way.
     playBuzzer();
   }
-  if (ball_y > SCREEN_HEIGHT) {
+  if ((ball_y + BALL_RADIUS) > SCREEN_HEIGHT) {
     resetBall();
   }
 }
@@ -124,8 +124,8 @@ void displayBall() {
   int16_t y0 = (int16_t)round(ball_y0);
   
   if (x != x0 || y != y0) {
-    tft.fillRect(x0, y0, BALL_WIDTH, BALL_HEIGHT, RA8875_BLACK);
-    tft.fillRect(x, y, BALL_WIDTH, BALL_HEIGHT, RA8875_WHITE);
+    tft.fillCircle(x0, y0, BALL_RADIUS, RA8875_BLACK);
+    tft.fillCircle(x, y, BALL_RADIUS, RA8875_WHITE);
   }
 }
 
@@ -138,7 +138,7 @@ void displayPaddle() {
 
 void displayScore() {
   if (balls != balls0 || score != score0 ||
-      (ball_x < (TEXT_LENGTH * 10) && int(ball_y) <= 11)) {
+      ((ball_x + BALL_RADIUS) < (TEXT_LENGTH * 10) && int(ball_y + BALL_RADIUS) <= 11)) {
     tft.textMode();
     tft.textSetCursor(10, 10);
     char buff[TEXT_LENGTH];
@@ -161,7 +161,7 @@ void displayScore() {
 void hitBall() {
   playBuzzer();
   score++;
-  if (score >= MAX_WAIT) {
+  if (score >= MAX_WAIT && ball_speed < 2) {
     double a = acos(ball_dy / ball_speed);
     ball_speed *= 1.1;
     ball_dy = cos(a) * -ball_speed;
@@ -185,8 +185,8 @@ void gameOver() {
 void scoreGame() {
   balls0 = balls;
   score0 = score;
-  if ((ball_y + BALL_HEIGHT) >= (SCREEN_HEIGHT - BALL_HEIGHT)) {
-    if (int(ball_x + BALL_WIDTH) >= paddle_x && int(ball_x) <= (paddle_x + PADDLE_WIDTH)) {
+  if ((ball_y + BALL_RADIUS) >= (SCREEN_HEIGHT - BALL_RADIUS*2)) {
+    if (int(ball_x + BALL_RADIUS) >= paddle_x && int(ball_x) <= (paddle_x + PADDLE_WIDTH)) {
       hitBall();
     } else {
       balls--;
