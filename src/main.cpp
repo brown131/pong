@@ -1,17 +1,6 @@
 /******************************************************************
- This is an example for the Adafruit RA8875 Driver board for TFT displays
- ---------------> http://www.adafruit.com/products/1590
- The RA8875 is a TFT driver for up to 800x480 dotclock'd displays
- It is tested to work with displays in the Adafruit shop. Other displays
- may need timing adjustments and are not guanteed to work.
-
- Adafruit invests time and resources providing this open
- source code, please support Adafruit and open-source hardware
- by purchasing products from Adafruit!
-
- Written by Limor Fried/Ladyada for Adafruit Industries.
- BSD license, check license.txt for more information.
- All text above must be included in any redistribution.
+ Pong Game
+ Scott Brown   May 10, 2020
  ******************************************************************/
 
 #include <SPI.h>
@@ -19,10 +8,6 @@
 #include "Adafruit_GFX.h"
 #include "Adafruit_RA8875.h"
 
-// Library only supports hardware SPI at this time
-// Connect SCLK to UNO Digital #13 (Hardware SPI clock)
-// Connect MISO to UNO Digital #12 (Hardware SPI MISO)
-// Connect MOSI to UNO Digital #11 (Hardware SPI MOSI)
 #define RA8875_INT 3
 #define RA8875_CS 10
 #define RA8875_RESET 4
@@ -163,7 +148,7 @@ void hitBall() {
   score++;
   if (score >= MAX_WAIT && ball_speed < 2) {
     double a = acos(ball_dy / ball_speed);
-    ball_speed *= 1.1;
+    ball_speed *= 1.05;
     ball_dy = cos(a) * -ball_speed;
     ball_dx = (sin(a) * ball_speed) * (ball_dx < 0 ? 1 : -1);
   } else {
