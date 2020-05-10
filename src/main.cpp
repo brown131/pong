@@ -73,7 +73,7 @@ void directBall() {
 }
 
 void playBuzzer() {
-   for (int i = 0; i < 80; i++) {
+   for (int i = 0; i < 10; i++) {
     digitalWrite(BUZZER_PIN, HIGH);
     delay(1);
     digitalWrite(BUZZER_PIN, LOW);
@@ -100,55 +100,18 @@ void setup()
 
   tft.graphicsMode(); 
   tft.fillScreen(RA8875_BLACK);
-  tft.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT, RA8875_WHITE);
+  //tft.fillRect(ball_x, ball_y, BALL_WIDTH, BALL_HEIGHT, RA8875_WHITE);
   tft.fillRect((int16_t)paddle_x, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_WHITE);
 
   directBall();
 }
 
-void displayBall() {
-  int16_t x = (int16_t)round(ball_x);
-  int16_t y = (int16_t)round(ball_y);
-  int16_t x0 = (int16_t)round(ball_x0);
-  int16_t y0 = (int16_t)round(ball_y0);
-  //int16_t dx = (int16_t)round(abs(ball_dx));
-  //int16_t dy = (int16_t)round(ball_dy);
-  
-  if (x != x0 || y != y0) {
-    tft.fillRect(x0, y0, BALL_WIDTH, BALL_HEIGHT, RA8875_BLACK);
-    tft.fillRect(x, y, BALL_WIDTH, BALL_HEIGHT, RA8875_WHITE);
-  }
-/*   if (y > y0 && dy == 1) {
-    tft.fillRect(x0, y0, BALL_WIDTH, 1, RA8875_BLACK);
-    tft.fillRect(x, y0 + BALL_HEIGHT, BALL_WIDTH, 1, RA8875_WHITE);
-  }
-  if (ball_dx < 0.0F && x < x0) {
-    tft.fillRect(abs(x), y, 1, BALL_HEIGHT - 1, RA8875_WHITE);
-    tft.fillRect(abs(x) + BALL_WIDTH, y, 1, BALL_HEIGHT - 1, RA8875_BLACK);
-  }
-  if (ball_dx > 0.0F && x > x0) {
-    tft.fillRect(x0, y, 1, BALL_HEIGHT - 1, RA8875_BLACK);
-    tft.fillRect(x0 + BALL_WIDTH, y, 1, BALL_HEIGHT - 1, RA8875_WHITE);
-  } */
-}
-
-void displayScore() {
-  tft.textMode();
-  tft.textColor(RA8875_WHITE, RA8875_BLACK);
-  tft.textSetCursor(10, 10);
-  char spaces[48];
-  memset(spaces, ' ', 48);
-  spaces[48] = '\0';
-  tft.textWrite(spaces);
-  tft.textSetCursor(10, 10);debug("Score!!!");
-}
-
-void loop()
-{
+void moveBall() {
   ball_x0 = ball_x;
   ball_y0 = ball_y;
   ball_x += ball_dx;
   ball_y += ball_dy;
+
   if (ball_x < 0.0F) {
     ball_x = 0.0F;
     ball_dx *= -1.0F;
@@ -159,32 +122,62 @@ void loop()
     ball_dx *= -1.0F;
     playBuzzer();
   }
+  if (ball_y < 0.0F) {
+    ball_x *= -1.0F;
+    ball_y *= -1.0F;
+  }
   if (ball_y > 272.0F) {
-    ball_x = (static_cast <double> (rand()) / static_cast <double> (RAND_MAX)) * 480.0F;
+    ball_x = rnd() * 480.0F;
     ball_y = 0.0F;
     directBall();
   }
+}
 
-  displayBall();
-  
+void movePaddle() {
   int32_t a = analogRead(X_PIN);
   paddle_x0 = paddle_x;
   paddle_x = (a * (480 - PADDLE_WIDTH)) >> 10;
+}
 
-  /*  tft.textMode();
-  tft.textColor(RA8875_WHITE, RA8875_BLACK);
-  char *xstr = (char *) "                  ";
-  sprintf(xstr, "%f ", ball_dx);
-  debug(xstr);
-  //char *ystr = (char *) "                  ";
- // sprintf(ystr, "%f", ball_dy);
- // tft.textWrite(ystr);
-  tft.graphicsMode(); */
+void displayBall() {
+  int16_t x = (int16_t)round(ball_x);
+  int16_t y = (int16_t)round(ball_y);
+  int16_t x0 = (int16_t)round(ball_x0);
+  int16_t y0 = (int16_t)round(ball_y0);
+  
+  if (x != x0 || y != y0) {
+    tft.fillRect(x0, y0, BALL_WIDTH, BALL_HEIGHT, RA8875_BLACK);
+    tft.fillRect(x, y, BALL_WIDTH, BALL_HEIGHT, RA8875_WHITE);
+  }
+}
 
+void displayPaddle() {
   if (paddle_x != paddle_x0) {
     tft.fillRect((int16_t)paddle_x0, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_BLACK);
   }
   tft.fillRect((int16_t)paddle_x, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_WHITE);
+}
 
+void displayScore() {
+  tft.textMode();
+  tft.textColor(RA8875_WHITE, RA8875_BLACK);
+  tft.textSetCursor(10, 10);
+  char spaces[48];
+  memset(spaces, ' ', 22);
+  spaces[22] = '\0';
+  tft.textWrite(spaces);
+  tft.textSetCursor(10, 10);debug("Balls: 00  Score: 0000");
+  tft.graphicsMode();
+}
+
+void loop()
+{
+  moveBall();
+  movePaddle();
+
+  displayBall();
+  displayPaddle();
+  displayScore();
+  
   delay(10);
 }
