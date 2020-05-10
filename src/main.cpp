@@ -68,7 +68,7 @@ double rnd() {
 
 void resetBall() {
   // Send ball in a random direction from the top of the screen.
-  ball_x = rnd() * SCREEN_WIDTH;
+  ball_x = rnd() * (SCREEN_WIDTH - PADDLE_WIDTH);
   ball_y = 0;
   double a = rnd() * PI / 3;  // Angle <= 60 degrees.
   ball_dy = cos(a) * ball_speed;
@@ -112,9 +112,9 @@ void moveBall() {
 }
 
 void movePaddle() {
-  int32_t a = analogRead(X_PIN);
+  int32_t x = analogRead(X_PIN);
   paddle_x0 = paddle_x;
-  paddle_x = (a * (SCREEN_WIDTH - PADDLE_WIDTH)) >> 10;
+  paddle_x = (x * (SCREEN_WIDTH - PADDLE_WIDTH)) >> 10;
 }
 
 void displayBall() {
@@ -132,8 +132,8 @@ void displayBall() {
 void displayPaddle() {
   if (paddle_x != paddle_x0) {
     tft.fillRect((int16_t)paddle_x0, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_BLACK);
+    tft.fillRect((int16_t)paddle_x, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_WHITE);
   }
-  tft.fillRect((int16_t)paddle_x, PADDLE_Y, PADDLE_WIDTH, PADDLE_HEIGHT, RA8875_WHITE);
 }
 
 void displayScore() {
@@ -185,20 +185,26 @@ void gameOver() {
 void scoreGame() {
   balls0 = balls;
   score0 = score;
-  if ((ball_y + BALL_RADIUS) >= (SCREEN_HEIGHT - BALL_RADIUS*2)) {
-    if (int(ball_x + BALL_RADIUS) >= paddle_x && int(ball_x) <= (paddle_x + PADDLE_WIDTH)) {
-      hitBall();
-    } else {
-      balls--;
-      if (balls == 0) {
-        displayScore();
-        gameOver();
-        return;
-      } else {
-        resetBall();
+  if (ball_y >= (SCREEN_HEIGHT - 1 - BALL_RADIUS*3)) {
+    if (int(ball_x + BALL_RADIUS) >= paddle_x && int(ball_x - BALL_RADIUS) <= (paddle_x + PADDLE_WIDTH)) {
+      if (!hit_ball) {
+        hitBall();
+        hit_ball = true;
       }
+      return;
     }
   }
+  if (ball_y >= (SCREEN_HEIGHT - 1 - BALL_RADIUS)) {
+    balls--;
+    if (balls == 0) {
+      displayScore();
+      gameOver();
+      return;
+    } else {
+      resetBall();
+    }
+  }
+  hit_ball = false;
 }
 
 void setup()
