@@ -68,8 +68,8 @@ double rnd() {
 
 void resetBall() {
   // Send ball in a random direction from the top of the screen.
-  ball_x = rnd() * (SCREEN_WIDTH - PADDLE_WIDTH);
-  ball_y = 0;
+  ball_x = rnd() * (SCREEN_WIDTH - BALL_RADIUS * 2) + BALL_RADIUS;
+  ball_y = BALL_RADIUS;
   double a = rnd() * PI / 3;  // Angle <= 60 degrees.
   ball_dy = cos(a) * ball_speed;
   ball_dx = (sin(a) * ball_speed) * (rnd() >= 0.5 ? 1 : -1);
@@ -93,7 +93,7 @@ void moveBall() {
 
   if ((ball_x - BALL_RADIUS) < 0) {
     ball_x = BALL_RADIUS;
-    ball_dx = 1 - square(ball_dy);  // Needs to be done
+    ball_dx = ball_speed - square(ball_dy);  // Needs to be done
     playBuzzer();
   }
   if ((ball_x + BALL_RADIUS) > SCREEN_WIDTH) {
@@ -185,7 +185,7 @@ void gameOver() {
 void scoreGame() {
   balls0 = balls;
   score0 = score;
-  if (ball_y >= (SCREEN_HEIGHT - 1 - BALL_RADIUS*3)) {
+  if (ball_y >= (SCREEN_HEIGHT - 1 - BALL_RADIUS * 3)) {
     if (int(ball_x + BALL_RADIUS) >= paddle_x && int(ball_x - BALL_RADIUS) <= (paddle_x + PADDLE_WIDTH)) {
       if (!hit_ball) {
         hitBall();
@@ -207,8 +207,7 @@ void scoreGame() {
   hit_ball = false;
 }
 
-void setup()
-{
+void setup() {
   pinMode(BUZZER_PIN,OUTPUT);
 
   /* Initialize the display using 'RA8875_480x80', 'RA8875_480x128', 'RA8875_480x272' or 'RA8875_800x272' */
@@ -237,8 +236,7 @@ void setup()
   resetBall();
 }
 
-void loop()
-{
+void loop() {
   moveBall();
   movePaddle();
   scoreGame();
