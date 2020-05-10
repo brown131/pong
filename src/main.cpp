@@ -71,8 +71,9 @@ void resetBall() {
   // Send ball in a random direction from the top of the screen.
   ball_x = rnd() * SCREEN_WIDTH;
   ball_y = 0;
-  ball_dy = rnd() / 2 + 0.5;
-  ball_dx = (1 - square(ball_dy)) * (rnd() > 0.5 ? 1 : -1);
+  double a = rnd() * PI / 3;  // Angle <= 60 degrees.
+  ball_dy = cos(a) * ball_speed;
+  ball_dx = (sin(a) * ball_speed) * (rnd() >= 0.5 ? 1 : -1);
 }
 
 void playBuzzer(int cycles = 10) {
@@ -161,8 +162,10 @@ void hitBall() {
   playBuzzer();
   score++;
   if (score >= MAX_WAIT) {
+    double a = acos(ball_dy / ball_speed);
     ball_speed *= 1.1;
-    //ball_dx = ball_speed - square()
+    ball_dy = cos(a) * -ball_speed;
+    ball_dx = (sin(a) * ball_speed) * (ball_dx < 0 ? 1 : -1);
   } else {
     ball_dy *= -1;
   }
