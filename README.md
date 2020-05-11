@@ -12,4 +12,4 @@ Parts:
 * Joystick
 
 Layout:
-![pong](/doc/pong.png?raw=true)
+![pong](pong.png?raw=true)
