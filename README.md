@@ -6,6 +6,7 @@ to prevent the chip's power supply from being overwhelmed.
 
 Parts:
 * Adafruit Pro Trinket 5V
+* 4.3" 40-pin 480x272 4.3" TFT Display
 * Adafruit RA8875
 * Breadboard power supply
 * Active buzzer
@@ -13,3 +14,6 @@ Parts:
 
 Layout:
 ![pong](pong.png?raw=true)
+
+Breadboard:
+![rig](IMG_2740.HEIC)
