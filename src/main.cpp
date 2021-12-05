@@ -30,6 +30,7 @@
         
 */
 
+/*
  COMPILE BUG WORKAROUND
  Need to copy ~/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src/EEPROM.h to
  .pio/libdeps/protrinket5/Adafruit RA8875
