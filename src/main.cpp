@@ -3,10 +3,42 @@
  Scott Brown   May 10, 2020
  ******************************************************************/
 
+/*
+        +----------------+           +-----------------+
+        |            D13 |-----------| SCK             |
+        |            D12 |-----------| MISO            |
+        |            D11 |-----------| MOSI   TFT LCD  |
+        |            D10 |-----------| CS     display  |
+        |             D3 |-----------| INT     RA8875  |
+        |            TXD |-----------| RESET   module  |
+        |                |     GND <-|                 |
+        |   adafruit     |      5v <-|                 |
+        |  pro trinket   |           +-----------------+
+        |      5V        |           +----------------+
+        |             A1 |-----------| HORZ           |
+        |             A0 |-----------| VERT  thumb    |
+        |             D5 |-----------| SEL  joystick  |
+        |                |     GND <-|       module   |
+        |                |      5v <-|                |
+        |                |           +----------------+
+        |                |             +------+
+        |                |            /        \ 
+        |            GND |---------->|  active  |
+        |             5v |---------->|  buzzer  |
+        |                |            \        /
+        +----------------+             +------+
+        
+*/
+
+ COMPILE BUG WORKAROUND
+ Need to copy ~/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src/EEPROM.h to
+ .pio/libdeps/protrinket5/Adafruit RA8875
+*/
+
 #include <SPI.h>
 #include <time.h>
-#include "Adafruit_GFX.h"
-#include "Adafruit_RA8875.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_RA8875.h>
 
 #define RA8875_INT 3
 #define RA8875_CS 10
